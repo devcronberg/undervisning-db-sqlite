@@ -20,7 +20,7 @@ så kan du benytte ```connectionString``` direkte i koden.
 
 ## EF
 
-Hvis du skal lege med databasen gennem EF så skab en ny tom Console Application (.NET Core) og tilføje NUGET pakken
+Hvis du skal lege med databasen gennem EF så skab en ny tom Console Application (.NET Core) og tilføj NuGet pakken
 
 ```
 Microsoft.EntityFrameworkCore.Sqlite
