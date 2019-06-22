@@ -13,7 +13,7 @@ og i C# kan du evt benytte følgende kode:
 
 ```csharp
 private static string databaseFil = "c:\\temp\\people.db";
-private static string connectionString = "Data Source=" + databaseFil + ";
+private static string connectionString = "Data Source=" + databaseFil;
 ```
 
 så kan du benytte ```connectionString``` direkte i koden.
