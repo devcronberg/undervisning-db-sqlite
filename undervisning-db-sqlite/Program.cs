@@ -5,7 +5,7 @@ namespace undervisning_db_sqlite
 {
     class Program
     {
-        private static string databaseFil = "personer.db";
+        private static string databaseFil = "people.db";
         private static string connectionString = "Data Source=" + databaseFil + ";Version=3;";
 
         static void Main(string[] args)
