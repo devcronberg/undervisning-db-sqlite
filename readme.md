@@ -3,7 +3,7 @@
 Dette repository indeholder kode til at skabe en simpel SQLite database til brug i undervisning. 
 
 ## Download
-[Klik her for at downloade databasen (people.db)}(https://github.com/mcronberg/undervisning-db-sqlite/raw/master/db-download/people.db). Hvis den placeres i c:\temp er connectionstring som følger:
+[Klik her for at downloade databasen (people.db)](https://github.com/mcronberg/undervisning-db-sqlite/raw/master/db-download/people.db). Hvis den placeres i c:\temp er connectionstring som følger:
 
 ```
 Data Source=c:\temp\people.db;Version=3;
