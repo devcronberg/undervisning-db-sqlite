@@ -20,10 +20,11 @@ så kan du benytte ```connectionString``` direkte i koden.
 
 ## EF
 
-Hvis du skal lege med databasen gennem EF så skab en ny tom Console Application (.NET Core) og tilføj NuGet pakken
+Hvis du skal lege med databasen gennem EF så skab en ny tom Console Application (.NET Core) og tilføj NuGet pakkerne
 
 ```
 Microsoft.EntityFrameworkCore.Sqlite
+Microsoft.Extensions.Logging
 ```
 
 Du kan herefter benytte følgende model (forudsætter db er i c:\temp)
@@ -33,6 +34,7 @@ namespace SQLiteEF
 {
     using System.ComponentModel.DataAnnotations.Schema;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Logging;
 
     [Table("person")]
     public class Person
@@ -70,6 +72,17 @@ namespace SQLiteEF
         }
     }
 
+}
+```
+
+Du kan eventuel se om der er hul igennem med:
+
+```csharp
+using (PeopleContext c = new PeopleContext())
+{                
+    List<Person> lst;
+    lst = c.People.Take(5).ToList();
+    lst.ForEach(i => Console.WriteLine(i.LastName));
 }
 ```
 
