@@ -78,9 +78,9 @@ namespace SQLiteEF
 Du kan eventuel se om der er hul igennem med:
 
 ```csharp
-using (PeopleContext c = new PeopleContext())
+using (SQLiteEF.PeopleContext c = new SQLiteEF.PeopleContext())
 {                
-    List<Person> lst;
+    List<SQLiteEF.Person> lst;
     lst = c.People.Take(5).ToList();
     lst.ForEach(i => Console.WriteLine(i.LastName));
 }
