@@ -35,6 +35,7 @@ namespace SQLiteEF
     using System.ComponentModel.DataAnnotations.Schema;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.DependencyInjection;
 
     [Table("person")]
     public class Person
