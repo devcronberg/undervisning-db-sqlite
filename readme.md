@@ -72,6 +72,13 @@ namespace SQLiteEF
         public DateTime DateOfBirth { get; set; }
         public bool IsHealthy { get; set; }
         public int Gender { get; set; }
+        public int Height { get; set; }
+
+        public override string ToString()
+        {
+            return $"I'm {FirstName} {LastName} with id {PersonId} born {DateOfBirth.ToShortDateString()}. I'm {(IsHealthy ? "healthy" : "not healthy")}, a {(Gender == 1 ? "woman" : "man")} and {Height} cm.";
+        }
+        
     }
 
     public class PeopleContext : DbContext
@@ -109,7 +116,7 @@ using (SQLiteEF.PeopleContext c = new SQLiteEF.PeopleContext())
 {                
     List<SQLiteEF.Person> lst;
     lst = c.People.Take(5).ToList();
-    lst.ForEach(i => Console.WriteLine(i.LastName));
+    lst.ForEach(i => Console.WriteLine(i));
 }
 ```
 
