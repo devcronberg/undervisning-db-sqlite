@@ -28,6 +28,21 @@ private static string connectionString = "Data Source=" + databaseFil;
 
 så kan du benytte ```connectionString``` direkte i koden.
 
+Her er et kort eksempel:
+
+```csharp
+using (SQLiteConnection cn = new SQLiteConnection(connectionString))
+{
+    cn.Open();
+    using (SQLiteCommand cm = new SQLiteCommand(cn))
+    {
+        cm.CommandText = "select count(*) from person where height<160";
+        cm.CommandType = System.Data.CommandType.Text;
+        object resultat = cm.ExecuteScalar();
+        Console.WriteLine($"Der er {resultat} under 160 i tabellen");
+    }
+}
+```
 
 ## EF
 
