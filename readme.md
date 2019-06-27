@@ -50,7 +50,7 @@ Hvis du skal lege med databasen gennem EF så skab en ny tom Console Application
 
 ```
 Microsoft.EntityFrameworkCore.Sqlite
-Microsoft.Extensions.Logging
+Microsoft.Extensions.Logging.Console
 ```
 
 Du kan herefter benytte følgende model (forudsætter db er i c:\temp)
