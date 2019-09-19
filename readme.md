@@ -58,6 +58,7 @@ Du kan herefter benytte følgende model (forudsætter db er i c:\temp)
 ```csharp
 namespace SQLiteEF
 {
+    using System;
     using System.ComponentModel.DataAnnotations.Schema;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
