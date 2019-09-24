@@ -26,7 +26,7 @@
 
         public override string ToString()
         {
-            return $"I'm {FirstName} {LastName} with id {PersonId} born {DateOfBirth.ToShortDateString()}. I'm {(IsHealthy ? "healthy" : "not healthy")}, a {Gender.ToString()} and {Height} cm.";
+            return $"{PersonId} {FirstName} {LastName}";
         }
     }
 
@@ -35,19 +35,34 @@
     {
         public int CountryId { get; set; }
         public string Name { get; set; }
+        
+        // Optional
         public List<Person> People { get; set; }
+
+        public override string ToString()
+        {
+            return $"{CountryId} {Name}";
+
+        }
     }
 
     public class PeopleContext : DbContext
     {
+        private readonly string pathToDb;
+
         public DbSet<Person> People { get; set; }
         public DbSet<Country> Countries { get; set; }
 
+        public PeopleContext(string pathToDb = @"c:\temp\people.db")
+        {
+            this.pathToDb = pathToDb;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {           
-            optionsBuilder.UseSqlite("Data Source=c:\\temp\\people.db");
+            optionsBuilder.UseSqlite("Data Source=" + pathToDb);
             // Enable logging to console
-            // optionsBuilder.UseLoggerFactory(GetLoggerFactory());
+            optionsBuilder.UseLoggerFactory(GetLoggerFactory());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -8,55 +8,39 @@ namespace undervisning_db_sqlite
 {
     class Program
     {
-        public static string databaseFil = @"C:\git\undervisning-db-sqlite\db-download\people.db";
-        public static string connectionString = "Data Source=" + databaseFil;
 
         static void Main(string[] args)
         {
-            using (PeopleContext c = new PeopleContext())
-            {
-                var country = c.Countries.Include(i => i.People).FirstOrDefault();
-                
-            }
-           
 
-        
+            var path = @"C:\temp\undervisning-db-sqlite\undervisning-db-sqlite\Data\people.db";
             
-        }
-
-        private static void CreateDb()
-        {
-            SQLiteConnection.CreateFile(databaseFil);
-            using (SQLiteConnection cn = new SQLiteConnection(connectionString))
+            // Get people
+            using (PeopleContext c = new PeopleContext(path))
             {
-                cn.Open();
-                using (SQLiteCommand cm = new SQLiteCommand(cn))
-                {
-                    cm.CommandText = "create table person (PersonId INTEGER PRIMARY KEY AUTOINCREMENT, FirstName VARCHAR(50), LastName VARCHAR(50), Height INTEGER, IsHealthy BOOL, DateOfBirth DATE, Gender INTEGER)";
-                    cm.CommandType = System.Data.CommandType.Text;
-                    cm.ExecuteNonQuery();
-                }
-
-                using (SQLiteCommand cm = new SQLiteCommand(cn))
-                {
-
-                    foreach (var person in MCronberg.PersonRepositoryStatic.JustGetPeople(200))
-                    {
-                        string sql = "insert into person (FirstName, LastName, Height, IsHealthy, DateOfBirth, Gender) ";
-                        sql += "values('" + person.FirstName + "', ";
-                        sql += "'" + person.LastName + "', ";
-                        sql += "" + person.Height + ", ";
-                        sql += "" + person.IsHealthy + ", ";
-                        sql += "'" + person.DateOfBirth.ToString("yyyy-MM-dd") + "',";
-                        sql += "" + Convert.ToInt32(person.Gender) + ")";
-                        cm.CommandText = sql;
-                        cm.CommandType = System.Data.CommandType.Text;
-                        cm.ExecuteNonQuery();
-                    }
-                }
+                var res = c.People.Where(i=>i.Height>170 && i.IsHealthy).OrderBy(i=>i.LastName).ToList();
+                res.ForEach(i => Console.WriteLine(i));
             }
 
+            // Get countries with navigation property
+            using (PeopleContext c = new PeopleContext(path))
+            {
+                var res = c.Countries.Include(i => i.People).ToList();
+                res.ForEach(i => {
+                    Console.WriteLine(i.Name);
+                    i.People.ForEach(x => Console.WriteLine("\t" + x));
+                });
+            }
+
+            // Get countries with join
+            using (PeopleContext c = new PeopleContext(path))
+            {
+                var res = from country in c.Countries orderby country.CountryId join person in c.People on country.CountryId equals person.CountryId select new { person.FirstName, person.LastName, country.Name };
+                res.ToList().ForEach(i => Console.WriteLine(i.FirstName + " " + i.LastName + " from " + i.Name));
+            }
+
+
         }
+
     }
 }
 
