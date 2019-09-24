@@ -1,9 +1,10 @@
 # SQLite demo database
 
-Dette repository indeholder kode til at skabe en simpel SQLite database til brug i undervisning. 
+Dette repository indeholder kode til at skabe en simpel SQLite database til brug i undervisning.
 
 ## Download
-[Klik her for at downloade databasen (people.db)](https://github.com/mcronberg/undervisning-db-sqlite/raw/master/db-download/people.db). 
+
+[Klik her for at downloade databasen (people.db)](https://github.com/devcronberg/undervisning-db-sqlite/raw/master/undervisning-db-sqlite/Data/people.db), og placer den i c:\temp.
 
 ## ADO
 
@@ -26,7 +27,7 @@ private static string databaseFil = "c:\\temp\\people.db";
 private static string connectionString = "Data Source=" + databaseFil;
 ```
 
-så kan du benytte ```connectionString``` direkte i koden.
+så kan du benytte `connectionString` direkte i koden.
 
 Her er et kort eksempel:
 
@@ -59,12 +60,17 @@ Du kan herefter benytte følgende model (forudsætter db er i c:\temp)
 namespace SQLiteEF
 {
     using System;
-    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.DependencyInjection;
 
-    [Table("person")]
+    public enum GenderType
+    {
+        Male,
+        Female
+    }
+
     public class Person
     {
         public int PersonId { get; set; }
@@ -72,28 +78,69 @@ namespace SQLiteEF
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
         public bool IsHealthy { get; set; }
-        public int Gender { get; set; }
+        public GenderType Gender { get; set; }
         public int Height { get; set; }
+        public int CountryId { get; set; }
+        public Country Country { get; set; }
 
         public override string ToString()
         {
-            return $"I'm {FirstName} {LastName} with id {PersonId} born {DateOfBirth.ToShortDateString()}. I'm {(IsHealthy ? "healthy" : "not healthy")}, a {(Gender == 1 ? "woman" : "man")} and {Height} cm.";
+            return $"{PersonId} {FirstName} {LastName}";
         }
-        
+    }
+
+
+    public class Country
+    {
+        public int CountryId { get; set; }
+        public string Name { get; set; }
+
+        // Optional
+        public List<Person> People { get; set; }
+
+        public override string ToString()
+        {
+            return $"{CountryId} {Name}";
+
+        }
     }
 
     public class PeopleContext : DbContext
     {
+        private readonly string pathToDb;
+
         public DbSet<Person> People { get; set; }
+        public DbSet<Country> Countries { get; set; }
+
+        public PeopleContext(string pathToDb = @"c:\temp\people.db")
+        {
+            this.pathToDb = pathToDb;
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=c:\\temp\\people.db");
+            optionsBuilder.UseSqlite("Data Source=" + pathToDb);
             // Enable logging to console
             // optionsBuilder.UseLoggerFactory(GetLoggerFactory());
-
         }
-        
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Person>(e =>
+            {
+                e.ToTable("Person");
+                e.Property(i => i.Gender).HasConversion(x => x.ToString(), x => (GenderType)Enum.Parse(typeof(GenderType), x));
+                e.HasOne(p => p.Country).WithMany(b => b.People).HasForeignKey(p => p.CountryId);
+            });
+
+            modelBuilder.Entity<Country>(e =>
+            {
+                e.ToTable("Country");
+            });
+
+            base.OnModelCreating(modelBuilder);
+        }
+
         // For logging...
         private ILoggerFactory GetLoggerFactory()
         {
@@ -106,29 +153,47 @@ namespace SQLiteEF
                     .GetService<ILoggerFactory>();
         }
     }
-
 }
 ```
 
 Du kan eventuel se om der er hul igennem med:
 
 ```csharp
-using (SQLiteEF.PeopleContext c = new SQLiteEF.PeopleContext())
-{                
-    List<SQLiteEF.Person> lst;
-    lst = c.People.Take(5).ToList();
-    lst.ForEach(i => Console.WriteLine(i));
+// people
+using (PeopleContext c = new PeopleContext(path))
+{
+    var res = c.People.Where(i => i.Height > 170 && i.IsHealthy).OrderBy(i => i.LastName).ToList();
+    res.ForEach(i => Console.WriteLine(i));
+}
+
+// navigation property
+using (PeopleContext c = new PeopleContext(path))
+{
+    var res = c.Countries.Include(i => i.People).ToList();
+    res.ForEach(i =>
+    {
+        Console.WriteLine(i.Name);
+        i.People.ForEach(x => Console.WriteLine("\t" + x));
+    });
+}
+
+// join
+using (PeopleContext c = new PeopleContext(path))
+{
+    var res = from country in c.Countries orderby country.CountryId join person in c.People on country.CountryId equals person.CountryId select new { person.FirstName, person.LastName, country.Name };
+    res.ToList().ForEach(i => Console.WriteLine(i.FirstName + " " + i.LastName + " from " + i.Name));
 }
 ```
 
 Hvis du vil vide mere om SQLite/EF/.NET Core så se denne [artikel](https://docs.microsoft.com/en-us/ef/core/get-started/netcore/new-db-sqlite).
 
 ### Identity med SqLite
+
 Se eventuelt [dette](https://github.com/devcronberg/aspnetcore22-identity-ef-sqlite) repository.
 
 ## Indhold i database
 
-Databasen består af en enkelte tabel med 200 tilfældige personer:
+Databasen består af en person tabel med 200 tilfældige personer:
 
 - PersonId (int)
 - FirstName (string)
@@ -136,10 +201,17 @@ Databasen består af en enkelte tabel med 200 tilfældige personer:
 - Height (int)
 - IsHealthy (bool)
 - Gender (int)
+- CountryId
+
+og en country tabel med fire lande
+
+- CountryId
+- Name
 
 ## SQLite browser
+
 Der findes et godt værktøj til SQLite databaser kaldet [SQLite browser](https://sqlitebrowser.org/dl/). Den kan du eventuelt hente hvis du vil se nærmere på design og data.
 
-
 ## Rettigheder
+
 Database og kode kan benyttes frit men smid gerne et link retur til dette repository.
