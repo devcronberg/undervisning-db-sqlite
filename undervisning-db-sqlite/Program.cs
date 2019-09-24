@@ -1,16 +1,27 @@
 ﻿using System;
 using System.Data.SQLite;
+using SQLiteEF;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace undervisning_db_sqlite
 {
     class Program
     {
-        private static string databaseFil = "people.db";
-        private static string connectionString = "Data Source=" + databaseFil + ";Version=3;";
+        public static string databaseFil = @"C:\git\undervisning-db-sqlite\db-download\people.db";
+        public static string connectionString = "Data Source=" + databaseFil;
 
         static void Main(string[] args)
         {
-            CreateDb();
+            using (PeopleContext c = new PeopleContext())
+            {
+                var country = c.Countries.Include(i => i.People).FirstOrDefault();
+                
+            }
+           
+
+        
+            
         }
 
         private static void CreateDb()
