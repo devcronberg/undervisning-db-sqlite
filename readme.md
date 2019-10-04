@@ -129,7 +129,7 @@ namespace SQLiteEF
             modelBuilder.Entity<Person>(e =>
             {
                 e.ToTable("Person");
-                e.Property(i => i.Gender).HasConversion(x => x.ToString(), x => (GenderType)Enum.Parse(typeof(GenderType), x));
+                e.Property(i => i.Gender).HasConversion(x => (int)x, x => (GenderType)Enum.Parse(typeof(GenderType), x.ToString()));
                 e.HasOne(p => p.Country).WithMany(b => b.People).HasForeignKey(p => p.CountryId);
             });
 
