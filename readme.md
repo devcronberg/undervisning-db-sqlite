@@ -187,6 +187,10 @@ using (PeopleContext c = new PeopleContext(path))
 
 Hvis du vil vide mere om SQLite/EF/.NET Core så se denne [artikel](https://docs.microsoft.com/en-us/ef/core/get-started/netcore/new-db-sqlite).
 
+### OData
+
+Se eventuelt [dette](https://github.com/devcronberg/ODataDemo) repository.
+
 ### Identity med SqLite
 
 Se eventuelt [dette](https://github.com/devcronberg/aspnetcore22-identity-ef-sqlite) repository.
