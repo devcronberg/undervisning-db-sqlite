@@ -3,8 +3,6 @@
     using System;
     using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.DependencyInjection;
 
     public enum GenderType
     {
@@ -26,7 +24,7 @@
 
         public override string ToString()
         {
-            return $"{PersonId} {FirstName} {LastName}";
+            return $"{this.PersonId} {this.FirstName} {this.LastName}";
         }
     }
 
@@ -41,7 +39,7 @@
 
         public override string ToString()
         {
-            return $"{CountryId} {Name}";
+            return $"{this.CountryId} {this.Name}";
 
         }
     }
@@ -61,8 +59,7 @@
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {           
             optionsBuilder.UseSqlite("Data Source=" + pathToDb);
-            // Enable logging to console
-            optionsBuilder.UseLoggerFactory(GetLoggerFactory());
+            optionsBuilder.LogTo(Console.WriteLine);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -80,18 +77,6 @@
             });
 
             base.OnModelCreating(modelBuilder);
-        }
-
-        // For logging...
-        private ILoggerFactory GetLoggerFactory()
-        {
-            IServiceCollection serviceCollection = new ServiceCollection();
-            serviceCollection.AddLogging(builder =>
-                   builder.AddConsole()
-                          .AddFilter(DbLoggerCategory.Database.Command.Name,
-                                     LogLevel.Information));
-            return serviceCollection.BuildServiceProvider()
-                    .GetService<ILoggerFactory>();
         }
     }
 
