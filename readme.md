@@ -47,11 +47,12 @@ using (SQLiteConnection cn = new SQLiteConnection(connectionString))
 
 ## EF
 
+> Bemærk - koden er opdateret til .NET 5 / EF 5
+
 Hvis du skal lege med databasen gennem EF så skab en ny tom Console Application (.NET Core) og tilføj NuGet pakkerne
 
 ```
 Microsoft.EntityFrameworkCore.Sqlite
-Microsoft.Extensions.Logging.Console
 ```
 
 Du kan herefter benytte følgende model (forudsætter db er i c:\temp)
@@ -62,8 +63,6 @@ namespace SQLiteEF
     using System;
     using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.DependencyInjection;
 
     public enum GenderType
     {
@@ -85,22 +84,22 @@ namespace SQLiteEF
 
         public override string ToString()
         {
-            return $"{PersonId} {FirstName} {LastName}";
+            return $"{this.PersonId} {this.FirstName} {this.LastName}";
         }
     }
 
-
+    
     public class Country
     {
         public int CountryId { get; set; }
         public string Name { get; set; }
-
+        
         // Optional
         public List<Person> People { get; set; }
 
         public override string ToString()
         {
-            return $"{CountryId} {Name}";
+            return $"{this.CountryId} {this.Name}";
 
         }
     }
@@ -118,10 +117,9 @@ namespace SQLiteEF
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
+        {           
             optionsBuilder.UseSqlite("Data Source=" + pathToDb);
-            // Enable logging to console
-            // optionsBuilder.UseLoggerFactory(GetLoggerFactory());
+            optionsBuilder.LogTo(Console.WriteLine);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -129,7 +127,7 @@ namespace SQLiteEF
             modelBuilder.Entity<Person>(e =>
             {
                 e.ToTable("Person");
-                e.Property(i => i.Gender).HasConversion(x => (int)x, x => (GenderType)Enum.Parse(typeof(GenderType), x.ToString()));
+                e.Property(i => i.Gender).HasConversion(x => x.ToString(), x => (GenderType)Enum.Parse(typeof(GenderType), x));
                 e.HasOne(p => p.Country).WithMany(b => b.People).HasForeignKey(p => p.CountryId);
             });
 
@@ -140,19 +138,8 @@ namespace SQLiteEF
 
             base.OnModelCreating(modelBuilder);
         }
-
-        // For logging...
-        private ILoggerFactory GetLoggerFactory()
-        {
-            IServiceCollection serviceCollection = new ServiceCollection();
-            serviceCollection.AddLogging(builder =>
-                   builder.AddConsole()
-                          .AddFilter(DbLoggerCategory.Database.Command.Name,
-                                     LogLevel.Information));
-            return serviceCollection.BuildServiceProvider()
-                    .GetService<ILoggerFactory>();
-        }
     }
+
 }
 ```
 
