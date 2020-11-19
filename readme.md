@@ -49,7 +49,7 @@ using (SQLiteConnection cn = new SQLiteConnection(connectionString))
 
 > Bemærk - koden er opdateret til .NET 5 / EF 5
 
-Hvis du skal lege med databasen gennem EF så skab en ny tom Console Application (.NET Core) og tilføj NuGet pakkerne
+Hvis du skal lege med databasen gennem EF så skab en ny tom Console Application (.NET 5) og tilføj NuGet pakken
 
 ```
 Microsoft.EntityFrameworkCore.Sqlite
